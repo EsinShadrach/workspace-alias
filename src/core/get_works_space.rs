@@ -41,8 +41,8 @@ pub fn get_workspace() -> Result<Alias, WorkspaceError> {
     println!("Only Dirs: {:?}", directories);
 
     return Ok(Alias {
-        alias: "ls".to_string(),
-        command: "x".to_string(),
+        alias: "z".to_string(),
+        command: "ls".to_string(),
     });
 }
 

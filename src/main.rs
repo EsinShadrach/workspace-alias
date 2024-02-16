@@ -1,6 +1,7 @@
 pub mod core;
 pub mod utils;
 
+use core::create_alias::create_alias;
 use std::fmt;
 
 use utils::print_alias::print_alias;
@@ -21,6 +22,7 @@ impl fmt::Display for WorkspaceError {
 
 impl std::error::Error for WorkspaceError {}
 
+#[derive(Clone)]
 pub struct Alias {
     alias: String,
     command: String,
@@ -33,17 +35,9 @@ impl fmt::Display for Alias {
 }
 
 fn main() {
-    let alias_name = String::from("l");
-    let command_name = String::from("ls");
-
-    print_alias(Alias {
-        alias: alias_name,
-        command: command_name,
-    });
-
     match get_workspace() {
-        Ok(alias) => {
-            println!("{}", alias);
+        Ok(original_alias) => {
+            create_alias(&original_alias);
         }
         Err(err) => {
             eprintln!("Error: {}", err);
