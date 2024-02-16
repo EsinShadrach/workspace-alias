@@ -1,3 +1,20 @@
+/// Incase there's a space for some reason...
+/// `"My funny Alias" => myFunnyAlias`
+///
+/// # Arguments
+///
+/// - text: The String to be converted`
+///
+/// # Example
+/// ```
+/// let camelize = to_camel_case("My Name is");
+/// assert_eq!("myNameIs", camelize); // true
+/// ```
+///
+/// # Panics
+///
+/// Panics if failed to get first letter
+///
 pub fn to_camel_case(text: String) -> String {
     let mut camel_cased = String::new();
     // "My Name" => ["My", "Name"]
@@ -19,7 +36,7 @@ pub fn to_camel_case(text: String) -> String {
                         camel_cased.push_str(&letter_to_uppercase);
                     }
                     None => {
-                        panic!("Failed to get First Letter");
+                        panic!("Failed to get First letter");
                     }
                 }
             }

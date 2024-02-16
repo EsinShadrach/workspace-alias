@@ -9,7 +9,9 @@ use crate::{
 
 pub fn create_alias(alias: &Alias) {
     let camel_cased = to_camel_case(alias.alias.clone());
+    // This won't work
     let alias_command = format!("alias {}={}", camel_cased, alias.command);
+    // This won't work
     let execute_alias_creation = Command::new("sh").arg("-c").arg(&alias_command).spawn();
 
     match execute_alias_creation {
@@ -25,7 +27,7 @@ pub fn create_alias(alias: &Alias) {
 
 fn write_to_config(alias: &Alias) {
     let command = &alias.command;
-    let alias = &alias.alias;
+    let alias = to_camel_case(alias.alias.clone());
 
     let config_file_path = match env::var("SHELL") {
         Ok(s) if s.contains("zsh") => ".zshrc",
