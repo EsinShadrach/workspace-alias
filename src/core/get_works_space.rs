@@ -1,5 +1,7 @@
 use std::{fs, process::Command};
 
+use crate::utils::is_directory::is_directory;
+
 pub fn get_workspace() {
     let mut directories: Vec<String> = Vec::new();
     let mut files: Vec<String> = Vec::new();
@@ -33,16 +35,9 @@ pub fn get_workspace() {
         })
         .collect();
 
-    println!("{:?}", non_empty_results);
-}
-
-fn is_directory(path: &str) -> bool {
-    match fs::metadata(path) {
-        Ok(x) => {
-            return x.is_dir();
-        }
-        Err(_) => return false,
-    }
+    println!("ALL: {:?}", non_empty_results);
+    println!("Only Files: {:?}", files);
+    println!("Only Dirs: {:?}", directories);
 }
 
 // Rust Work-space files generally contain cargo.toml and cargo.lock
