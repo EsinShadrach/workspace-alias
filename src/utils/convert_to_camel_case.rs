@@ -10,16 +10,15 @@ pub fn to_camel_case(text: String) -> String {
                 camel_cased.push_str(&word.to_lowercase());
             }
             _ => {
-                // Get the first letter and turn it into an upperCase
                 let first_letter = word
                     .chars()
                     .next()
                     .expect("Failed to get First Letter")
                     .to_uppercase();
-                // Replace the first letter at index 0 with this
-                let mut x = first_letter.to_string();
-                x.push_str(&word);
-                camel_cased.push_str(&x);
+
+                let mut pushed_to_camel_case = first_letter.to_string();
+                pushed_to_camel_case.push_str(&word);
+                camel_cased.push_str(&pushed_to_camel_case);
             }
         }
     }
