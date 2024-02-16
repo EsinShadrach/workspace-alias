@@ -1,6 +1,8 @@
 use colorful::Color;
 use colorful::Colorful;
 
+use crate::Alias;
+
 /// Prints a formatted message to the console, creating an alias for a command.
 ///
 /// # Arguments
@@ -27,7 +29,7 @@ use colorful::Colorful;
 /// # Safety
 ///
 /// This function does not have any unsafe behavior.
-pub fn print_alias(alias: String, command: String) {
+pub fn print_alias(Alias { alias, command }: Alias) {
     let colored_alias = format!("alias {alias}")
         .color(Color::Cyan)
         .bold()

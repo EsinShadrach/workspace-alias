@@ -24,6 +24,7 @@ pub fn get_workspace() {
 
                 if is_directory(line) {
                     directories.push(lower_case_line.clone());
+                    // Maybe use a recursive function to keep going into folders
                 } else {
                     files.push(lower_case_line.clone());
                 }
