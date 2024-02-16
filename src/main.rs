@@ -1,26 +1,15 @@
-use colorful::Color;
-use colorful::Colorful;
+pub mod core;
+pub mod utils;
+
+use crate::core::get_works_space::get_workspace;
+use utils::print_alias::print_alias;
 
 fn main() {
-    let alias_name = String::from("run");
-    let command_name = String::from("bun dev");
+    let alias_name = String::from("l");
+    let command_name = String::from("ls");
 
     print_alias(alias_name, command_name);
-}
-
-fn print_alias(alias: String, command: String) {
-    let colored_alias = format!("alias {alias}")
-        .color(Color::Cyan)
-        .bold()
-        .underlined();
-    let colored_command = format!("command {command}")
-        .color(Color::Yellow)
-        .bold()
-        .underlined();
-
-    let display_text = format!("{colored_alias} created for {colored_command}");
-
-    println!("{display_text}");
+    get_workspace();
 }
 
 /*
