@@ -13,8 +13,14 @@ pub fn get_workspace() {
 
     // Output of `ls` end's with an empty string i know I could have probably spliced but...
     let non_empty: Vec<String> = out_vector
-        .filter(|x| *x != "")
-        .map(|f| f.to_lowercase())
+        .filter_map(|f| {
+            if !f.is_empty() {
+                // Output ins't empty
+                Some(f.to_lowercase())
+            } else {
+                None
+            }
+        })
         .collect();
 
     println!("{:?}", non_empty);
