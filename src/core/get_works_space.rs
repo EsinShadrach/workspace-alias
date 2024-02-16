@@ -1,15 +1,15 @@
 use std::process::Command;
 
-use crate::utils::is_directory::is_directory;
+use crate::{utils::is_directory::is_directory, Alias, WorkspaceError};
 
-pub fn get_workspace() {
+pub fn get_workspace() -> Result<Alias, WorkspaceError> {
     let mut directories: Vec<String> = Vec::new();
     let mut files: Vec<String> = Vec::new();
     let command = Command::new("ls").output().expect("Failed to get files");
 
     if !command.status.success() {
         eprintln!("Error: Failed to get files, which is essential to determine `workspace` type");
-        return;
+        return Err(WorkspaceError::CommandFailed);
     }
 
     let ls_output = String::from_utf8_lossy(&command.stdout);
@@ -39,6 +39,11 @@ pub fn get_workspace() {
     println!("ALL: {:?}", non_empty_results);
     println!("Only Files: {:?}", files);
     println!("Only Dirs: {:?}", directories);
+
+    return Ok(Alias {
+        alias: "ls".to_string(),
+        command: "x".to_string(),
+    });
 }
 
 // Rust Work-space files generally contain cargo.toml and cargo.lock

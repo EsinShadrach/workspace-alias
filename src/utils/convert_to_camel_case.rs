@@ -22,8 +22,6 @@ pub fn to_camel_case(text: String) -> String {
                         panic!("Failed to get First Letter");
                     }
                 }
-                // .expect("Failed to get First Letter")
-                // .to_uppercase();
             }
         }
     }

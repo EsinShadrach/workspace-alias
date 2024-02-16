@@ -3,10 +3,23 @@ pub mod utils;
 
 use std::fmt;
 
-use utils::convert_to_camel_case::to_camel_case;
 use utils::print_alias::print_alias;
 
 use crate::core::get_works_space::get_workspace;
+
+#[derive(Debug)]
+pub enum WorkspaceError {
+    CommandFailed,
+    DirectoryCheckFailed,
+}
+
+impl fmt::Display for WorkspaceError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::error::Error for WorkspaceError {}
 
 pub struct Alias {
     alias: String,
@@ -27,9 +40,15 @@ fn main() {
         alias: alias_name,
         command: command_name,
     });
-    let xx = to_camel_case("Hello world my name is rafe".to_string());
-    println!("{}", xx);
-    get_workspace();
+
+    match get_workspace() {
+        Ok(alias) => {
+            println!("{}", alias);
+        }
+        Err(err) => {
+            eprintln!("Error: {}", err);
+        }
+    }
 }
 
 /*
