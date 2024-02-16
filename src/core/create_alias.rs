@@ -1,3 +1,5 @@
+use colorful::Color;
+use colorful::Colorful;
 use std::{env, fs::OpenOptions, io::Write, process::Command};
 
 use crate::{
@@ -39,20 +41,26 @@ fn write_to_config(alias: &Alias) {
         Ok(home_path) => {
             let total_path = format!("{home_path}/{config_file_path}");
             println!("{}", total_path);
+
+            // Opens the Config file in append mode
             match OpenOptions::new().append(true).open(total_path) {
+                // Write Alias to file
                 Ok(mut file) => match file.write_all(alias_command.as_bytes()) {
-                    Err(e) => {
-                        eprintln!("Failed to write alias to configuration file: {}", e);
-                    }
                     Ok(_) => {
                         print_alias(Alias {
                             alias: alias.to_string(),
                             command: command.to_string(),
                         });
                     }
+                    Err(e) => {
+                        let err_msg =
+                            "Failed to write alias to configuration file:".color(Color::Red);
+                        eprintln!("{}{}", err_msg, e);
+                    }
                 },
                 Err(_) => {
-                    eprintln!("Failed to open configuration file for writing");
+                    let err_msg = "Failed to open configuration file for writing".color(Color::Red);
+                    eprintln!("{err_msg}");
                 }
             }
         }
