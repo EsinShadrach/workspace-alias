@@ -4,8 +4,6 @@ pub mod utils;
 use core::create_alias::create_alias;
 use std::fmt;
 
-use utils::print_alias::print_alias;
-
 use crate::core::get_works_space::get_workspace;
 
 #[derive(Debug)]
