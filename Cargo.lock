@@ -3,5 +3,14 @@
 version = 3
 
 [[package]]
+name = "colorful"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97af0562545a7d7f3d9222fcf909963bec36dcb502afaacab98c6ffac8da47ce"
+
+[[package]]
 name = "workspace-alias"
 version = "0.1.0"
+dependencies = [
+ "colorful",
+]
