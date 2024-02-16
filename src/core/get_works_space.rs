@@ -1,4 +1,4 @@
-use std::{fs, process::Command};
+use std::process::Command;
 
 use crate::utils::is_directory::is_directory;
 
