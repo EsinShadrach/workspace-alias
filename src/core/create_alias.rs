@@ -13,7 +13,6 @@ pub fn create_alias(alias: &Alias) {
     match execute_alias_creation {
         Ok(_) => {
             write_to_config(alias);
-            print_alias(alias.clone());
         }
         Err(err) => {
             println!("Failed to Create {}", alias);
@@ -45,7 +44,12 @@ fn write_to_config(alias: &Alias) {
                     Err(e) => {
                         eprintln!("Failed to write alias to configuration file: {}", e);
                     }
-                    _ => (),
+                    Ok(_) => {
+                        print_alias(Alias {
+                            alias: alias.to_string(),
+                            command: command.to_string(),
+                        });
+                    }
                 },
                 Err(_) => {
                     eprintln!("Failed to open configuration file for writing");
