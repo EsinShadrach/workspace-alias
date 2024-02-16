@@ -14,11 +14,13 @@ pub fn to_camel_case(text: String) -> String {
 
                 match first_letter {
                     Some(x) => {
-                        let mut pushed_to_camel_case = first_letter.to_string();
-                        pushed_to_camel_case.push_str(&word);
-                        camel_cased.push_str(&pushed_to_camel_case);
+                        let mut letter_to_uppercase = x.to_uppercase().to_string();
+                        letter_to_uppercase.push_str(&word[1..]);
+                        camel_cased.push_str(&letter_to_uppercase);
                     }
-                    None => (),
+                    None => {
+                        panic!("Failed to get First Letter");
+                    }
                 }
                 // .expect("Failed to get First Letter")
                 // .to_uppercase();
