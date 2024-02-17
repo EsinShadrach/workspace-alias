@@ -7,6 +7,6 @@ pub fn create_alias_command(alias: &Alias) -> String {
     let alias = &alias.alias;
     let alias = to_camel_case(alias.clone());
 
-    let alias_command = format!("alias {}={}\n", alias, command);
+    let alias_command = format!("alias {}=\"{}\"\n", alias, command);
     return alias_command;
 }

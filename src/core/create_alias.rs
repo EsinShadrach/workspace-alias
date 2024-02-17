@@ -22,6 +22,9 @@ pub fn create_alias(alias: &Alias) {
                     command: alias.command.to_string(),
                 });
 
+                // `so` command won't be available unless it's added at installation, we need to
+                // check for that and maybe run a pbcopy of so command
+                // Get os type and show command  like CMD + v or ctrl + shift + v
                 let source_alias = Alias {
                     alias: "so".to_owned(),
                     command: get_source_command(),
