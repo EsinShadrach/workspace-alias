@@ -10,6 +10,7 @@ use crate::core::get_works_space::get_workspace;
 pub enum WorkspaceError {
     CommandFailed,
     DirectoryCheckFailed,
+    WriteFailed,
 }
 
 impl fmt::Display for WorkspaceError {
