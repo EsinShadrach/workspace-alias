@@ -1,8 +1,7 @@
 pub mod core;
 pub mod utils;
 
-use core::create_alias::create_alias;
-use std::fmt;
+use std::{env, fmt, fs::File, path::Path};
 
 use crate::core::get_works_space::get_workspace;
 
@@ -36,7 +35,8 @@ impl fmt::Display for Alias {
 fn main() {
     match get_workspace() {
         Ok(original_alias) => {
-            create_alias(&original_alias);
+            // create_alias(&original_alias);
+            create_config_file();
         }
         Err(err) => {
             eprintln!("Error: {}", err);
@@ -45,5 +45,43 @@ fn main() {
 }
 
 /*
- * We need to know the workspace we're on and make alias based on those
+ * 1. Create a config file [x]
+ * 2. Read the config file  [ ]
+ * 3. Create a workspace alias in the config file [ ]
  * */
+
+fn create_config_file() {
+    // Get Home Path
+    let home_dir = env::var("HOME");
+    let mut config_file_path = String::new();
+
+    match home_dir {
+        Ok(x) => {
+            config_file_path.push_str(&x);
+        }
+        Err(err) => {
+            eprintln!("{err}");
+        }
+    }
+
+    config_file_path.push_str("/.workspace-alias");
+
+    println!("{config_file_path}");
+
+    // return config_file_path;
+    let path_exists = Path::new(&config_file_path).exists();
+
+    if !path_exists {
+        // Path doesn't exist
+        match File::create(&config_file_path) {
+            Ok(_) => {
+                println!("Created Config file path at {}", config_file_path);
+            }
+            Err(err) => {
+                eprintln!("Failed to create config file path {err}");
+            }
+        }
+    } else {
+        println!("Config file already exists {config_file_path}");
+    }
+}

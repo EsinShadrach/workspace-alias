@@ -3,6 +3,8 @@ use std::process::Command;
 use crate::{utils::is_directory::is_directory, Alias, WorkspaceError};
 
 pub fn get_workspace() -> Result<Alias, WorkspaceError> {
+    let mut workspace = String::new();
+
     let mut directories: Vec<String> = Vec::new();
     let mut files: Vec<String> = Vec::new();
     let command = Command::new("ls").output().expect("Failed to get files");
@@ -39,6 +41,14 @@ pub fn get_workspace() -> Result<Alias, WorkspaceError> {
     println!("ALL: {:?}", non_empty_results);
     println!("Only Files: {:?}", files);
     println!("Only Dirs: {:?}", directories);
+
+    if files.contains(&"cargo.toml".to_string()) || files.contains(&"cargo.lock".to_string()) {
+        workspace = "rust".to_string();
+        return Ok(Alias {
+            alias: "z".to_string(),
+            command: "cargo".to_string(),
+        });
+    }
 
     return Ok(Alias {
         alias: "z".to_string(),
