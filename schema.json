@@ -2,36 +2,41 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "patternProperties": {
-    "^[a-zA-Z]+$": {
+    "^[a-zA-Z0-9_-]+$": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The display name of the language."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "A unique identifier for the language type."
         },
         "fileMatch": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "File patterns associated with the language."
         },
         "commands": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of commands for building, running, testing, etc."
         },
         "command_alias": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Aliases for commands, providing alternative names."
         }
       },
-      "required": ["name", "type", "fileMatch", "commands", "command_alias"]
+      "required": ["name", "type", "fileMatch", "commands", "command_alias"],
+      "additionalProperties": false
     }
-  },
-  "additionalProperties": false
+  }
 }
