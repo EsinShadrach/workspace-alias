@@ -30,14 +30,16 @@ use crate::Alias;
 ///
 /// This function does not have any unsafe behavior.
 pub fn print_alias(Alias { alias, command }: Alias) {
-    let colored_alias = format!("alias {alias}")
-        .color(Color::Cyan)
-        .bold()
-        .underlined();
-    let colored_command = format!("command {command}")
-        .color(Color::Yellow)
-        .bold()
-        .underlined();
+    let colored_alias = format!(
+        "{} {}",
+        "alias".color(Color::Blue),
+        alias.color(Color::Cyan).bold().underlined()
+    );
+    let colored_command = format!(
+        "{} {}",
+        "command".color(Color::Blue),
+        command.color(Color::Yellow).bold().underlined()
+    );
 
     let display_text = format!("{colored_alias} created for {colored_command}");
 

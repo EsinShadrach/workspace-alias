@@ -1,9 +1,13 @@
+use colorful::{Color, Colorful};
 use std::process::Command;
 
-use crate::{utils::is_directory::is_directory, Alias, WorkspaceError};
+use crate::{
+    utils::{command_map::workspace_command, is_directory::is_directory},
+    Alias, WorkspaceError,
+};
 
 pub fn get_workspace() -> Result<Alias, WorkspaceError> {
-    let mut workspace = String::new();
+    let mut _workspace: String = String::new();
 
     let mut directories: Vec<String> = Vec::new();
     let mut files: Vec<String> = Vec::new();
@@ -38,12 +42,25 @@ pub fn get_workspace() -> Result<Alias, WorkspaceError> {
         })
         .collect();
 
-    println!("ALL: {:?}", non_empty_results);
-    println!("Only Files: {:?}", files);
-    println!("Only Dirs: {:?}", directories);
+    // println!("ALL: {:?}", non_empty_results);
+    // println!("Only Files: {:?}", files);
+    // println!("Only Dirs: {:?}", directories);
 
     if files.contains(&"cargo.toml".to_string()) || files.contains(&"cargo.lock".to_string()) {
-        workspace = "rust".to_string();
+        _workspace = "rust".to_string();
+        let msg = format!(
+            "{} {}",
+            "Workspace for".color(Color::Green),
+            _workspace
+                .to_owned()
+                .color(Color::Magenta)
+                .bold()
+                .underlined()
+        );
+
+        println!("{msg}");
+
+        workspace_command(&_workspace);
         return Ok(Alias {
             alias: "z".to_string(),
             command: "cargo".to_string(),

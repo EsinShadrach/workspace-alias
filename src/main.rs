@@ -1,7 +1,7 @@
 pub mod core;
 pub mod utils;
 
-use std::{env, fmt, fs::File, path::Path};
+use std::fmt;
 
 use crate::core::get_works_space::get_workspace;
 
@@ -20,7 +20,7 @@ impl fmt::Display for WorkspaceError {
 
 impl std::error::Error for WorkspaceError {}
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Alias {
     alias: String,
     command: String,
@@ -34,9 +34,10 @@ impl fmt::Display for Alias {
 
 fn main() {
     match get_workspace() {
-        Ok(original_alias) => {
+        Ok(_original_alias) => {
+            // println!("{:?}", original_alias);
             // create_alias(&original_alias);
-            create_config_file();
+            // create_config_file();
         }
         Err(err) => {
             eprintln!("Error: {}", err);
@@ -50,38 +51,38 @@ fn main() {
  * 3. Create a workspace alias in the config file [ ]
  * */
 
-fn create_config_file() {
-    // Get Home Path
-    let home_dir = env::var("HOME");
-    let mut config_file_path = String::new();
+// fn create_config_file() {
+//    // Get Home Path
+//    let home_dir = env::var("HOME");
+//    let mut config_file_path = String::new();
 
-    match home_dir {
-        Ok(x) => {
-            config_file_path.push_str(&x);
-        }
-        Err(err) => {
-            eprintln!("{err}");
-        }
-    }
+//    match home_dir {
+//        Ok(x) => {
+//            config_file_path.push_str(&x);
+//        }
+//        Err(err) => {
+//            eprintln!("{err}");
+//        }
+//    }
 
-    config_file_path.push_str("/.workspace-alias");
+//    config_file_path.push_str("/.workspace-alias");
 
-    println!("{config_file_path}");
+//    println!("{config_file_path}");
 
-    // return config_file_path;
-    let path_exists = Path::new(&config_file_path).exists();
+//    // return config_file_path;
+//    let path_exists = Path::new(&config_file_path).exists();
 
-    if !path_exists {
-        // Path doesn't exist
-        match File::create(&config_file_path) {
-            Ok(_) => {
-                println!("Created Config file path at {}", config_file_path);
-            }
-            Err(err) => {
-                eprintln!("Failed to create config file path {err}");
-            }
-        }
-    } else {
-        println!("Config file already exists {config_file_path}");
-    }
-}
+//    if !path_exists {
+//        // Path doesn't exist
+//        match File::create(&config_file_path) {
+//            Ok(_) => {
+//                println!("Created Config file path at {}", config_file_path);
+//            }
+//            Err(err) => {
+//                eprintln!("Failed to create config file path {err}");
+//            }
+//        }
+//    } else {
+//        println!("Config file already exists {config_file_path}");
+//    }
+// }

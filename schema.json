@@ -1,43 +1,55 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "$comment": "this is just a reference to the json schema for the language configuration file",
-  "patternProperties": {
-    "^[a-zA-Z0-9_-]+$": {
+  "properties": {
+    "languages": {
       "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The display name of the language."
-        },
-        "type": {
-          "type": "string",
-          "description": "A unique identifier for the language type."
-        },
-        "fileMatch": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "File patterns associated with the language."
-        },
-        "commands": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of commands for building, running, testing, etc."
-        },
-        "command_alias": {
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
           "type": "object",
-          "additionalProperties": {
-            "type": "string"
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The display name of the language."
+            },
+            "type": {
+              "type": "string",
+              "description": "A unique identifier for the language type."
+            },
+            "file_match": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "File patterns associated with the language."
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of commands for building, running, testing, etc."
+            },
+            "command_alias": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Aliases for commands, providing alternative names."
+            }
           },
-          "description": "Aliases for commands, providing alternative names."
+          "required": [
+            "name",
+            "type",
+            "file_match",
+            "commands",
+            "command_alias"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": ["name", "type", "fileMatch", "commands", "command_alias"],
-      "additionalProperties": false
+      }
     }
-  }
+  },
+  "required": ["languages"],
+  "additionalProperties": false
 }
