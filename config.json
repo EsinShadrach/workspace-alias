@@ -1,5 +1,5 @@
 {
-  "$schema": "./schema.json",
+  "$schema": "https://raw.githubusercontent.com/EsinShadrach/assets/main/workspace-alias/schema.json",
   "languages": {
     "rust": {
       "name": "Rust",
