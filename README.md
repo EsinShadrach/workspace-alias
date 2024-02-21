@@ -5,3 +5,7 @@ Creates aliases for work spaces for projects i.e for a NextJS project using bun 
 Supports flutter
 Rust
 JS packages based on package.json and package manager
+init function to create alias-thing folder in root dir with
+
+1. Config json
+2. alias text
