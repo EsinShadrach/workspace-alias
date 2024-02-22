@@ -2,11 +2,12 @@ pub mod core;
 pub mod utils;
 
 use colorful::{Color, Colorful};
+use reqwest;
 use std::{
     env, fmt,
     fs::{self, File},
     io::Write,
-    path::{self, Path},
+    path::Path,
 };
 
 #[derive(Debug)]
@@ -35,9 +36,9 @@ impl fmt::Display for Alias {
         write!(f, "Alias: {}, Command: {}", self.alias, self.command)
     }
 }
-
-fn main() {
-    create_config_file();
+#[tokio::main]
+async fn main() {
+    create_config_file().await;
     // match get_workspace() {
     //     Ok(_original_alias) => {
     //         // println!("{:?}", original_alias);
@@ -57,7 +58,7 @@ fn main() {
  * 4. Create config.json there
  * */
 
-fn create_config_file() {
+async fn create_config_file() {
     let home_path = match env::var("HOME") {
         Ok(path) => path,
         Err(err) => {
@@ -90,19 +91,49 @@ fn create_config_file() {
     // Create config.json
     let config_json = config_path.join("config.json");
 
+    if config_json.exists() {
+        let msg = "config.json Already Exists".color(Color::Yellow);
+        println!("{msg}");
+        return;
+    }
+
     let mut json_file = match File::create(&config_json) {
         Ok(file_to_write) => file_to_write,
         Err(err) => {
-            let msg = "failed to get home path".color(Color::Red);
+            let msg = "Failed to create json".color(Color::Red);
             eprintln!("{msg}, {err}");
             return;
         }
     };
 
-    // Fetch config file from github
-    match json_file.write_all(b"{}") {
+    let val = async {
+        let config_req = reqwest::get(
+            "https://raw.githubusercontent.com/EsinShadrach/workspace-alias/main/config.json",
+        )
+        .await;
+
+        match config_req {
+            Ok(okay) => {
+                let json_text = okay.text().await.expect("Failed to read okay text");
+                return json_text;
+            }
+            Err(err) => {
+                let msg = "Failed to Write config.json".color(Color::Red);
+                let err_msg = format!("{msg}, {err}");
+                panic!("{err_msg}");
+            }
+        }
+    }
+    .await;
+
+    match json_file.write_all(val.as_bytes()) {
         Ok(_) => {
-            let msg = "Created Config Folder Succeffully".color(Color::Green);
+            let msg = format!(
+                "Created {} {}",
+                "config.json".bold(),
+                "Succeffully".color(Color::Green)
+            )
+            .color(Color::Green);
             println!("{msg}");
         }
         Err(err) => {
