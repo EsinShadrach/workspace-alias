@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::io::Read;
 use std::{collections::HashMap, fs::File};
 
-use crate::utils::print_alias::print_alias;
+use crate::core::create_alias::create_alias;
 use crate::Alias;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,7 +15,7 @@ struct Config {
 #[derive(Debug, Serialize, Deserialize)]
 struct LanguageConfig {
     name: String,
-    // the r#type means raw string
+    // the r#type means raw string so it means `type`
     r#type: String,
     file_match: Vec<String>,
     commands: Vec<String>,
@@ -38,7 +38,7 @@ pub fn workspace_command(command: &str) {
                                 Some(workspace_config) => {
                                     let workspace_alias = &workspace_config.command_alias;
                                     for (alias, command) in workspace_alias {
-                                        print_alias(Alias {
+                                        create_alias(&Alias {
                                             alias: alias.to_owned(),
                                             command: command.to_owned(),
                                         })

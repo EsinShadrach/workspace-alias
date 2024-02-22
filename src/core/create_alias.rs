@@ -10,7 +10,6 @@ pub fn create_alias(alias: &Alias) {
     let alias_command = create_alias_command(&alias);
 
     let total_path = get_source_path();
-    println!("{}", total_path);
 
     // Opens the Config file in append mode
     match OpenOptions::new().append(true).open(total_path) {
@@ -25,32 +24,6 @@ pub fn create_alias(alias: &Alias) {
                 // `so` command won't be available unless it's added at installation, we need to
                 // check for that and maybe run a pbcopy of so command
                 // Get os type and show command  like CMD + v or ctrl + shift + v
-                let source_alias = Alias {
-                    alias: "so".to_owned(),
-                    command: get_source_command(),
-                };
-
-                let alias_command = create_alias_command(&source_alias);
-
-                let create_source_config_alias = file.write_all(alias_command.as_bytes());
-
-                match create_source_config_alias {
-                    Ok(_) => {
-                        print_alias(source_alias);
-
-                        let msg = format!(
-                            "type {} to continue and use aliases",
-                            "so".color(Color::Green)
-                        );
-
-                        println!("{msg}");
-                    }
-                    Err(err) => {
-                        let err_msg =
-                            "Failed to write alias to configuration file:".color(Color::Red);
-                        eprintln!("{}{}", err_msg, err);
-                    }
-                }
             }
             Err(e) => {
                 let err_msg = "Failed to write alias to configuration file:".color(Color::Red);
@@ -62,10 +35,4 @@ pub fn create_alias(alias: &Alias) {
             eprintln!("{err_msg}");
         }
     }
-}
-
-fn get_source_command() -> String {
-    let source_path = get_source_path();
-    let source_command = format!("source {source_path}");
-    return source_command;
 }
