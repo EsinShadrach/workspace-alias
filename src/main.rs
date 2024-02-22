@@ -1,9 +1,13 @@
 pub mod core;
 pub mod utils;
 
-use std::fmt;
-
-use crate::core::get_works_space::get_workspace;
+use colorful::{Color, Colorful};
+use std::{
+    env, fmt,
+    fs::{self, File},
+    io::Write,
+    path::{self, Path},
+};
 
 #[derive(Debug)]
 pub enum WorkspaceError {
@@ -33,56 +37,77 @@ impl fmt::Display for Alias {
 }
 
 fn main() {
-    match get_workspace() {
-        Ok(_original_alias) => {
-            // println!("{:?}", original_alias);
-            // create_alias(&original_alias);
-            // create_config_file();
-        }
-        Err(err) => {
-            eprintln!("Error: {}", err);
-        }
-    }
+    create_config_file();
+    // match get_workspace() {
+    //     Ok(_original_alias) => {
+    //         // println!("{:?}", original_alias);
+    //         // create_alias(&original_alias);
+    //         // create_config_file();
+    //     }
+    //     Err(err) => {
+    //         eprintln!("Error: {}", err);
+    //     }
+    // }
 }
 
 /*
- * 1. Create a config file [x]
- * 2. Read the config file  [ ]
- * 3. Create a workspace alias in the config file [ ]
+ * 1. Get Home Path
+ * 2. Create a folder called alias-config
+ * 3. Print alias-config Created
+ * 4. Create config.json there
  * */
 
-// fn create_config_file() {
-//    // Get Home Path
-//    let home_dir = env::var("HOME");
-//    let mut config_file_path = String::new();
+fn create_config_file() {
+    let home_path = match env::var("HOME") {
+        Ok(path) => path,
+        Err(err) => {
+            let msg = "Failed to get home path".color(Color::Red);
+            eprintln!("{msg}, {err}");
+            return;
+        }
+    };
 
-//    match home_dir {
-//        Ok(x) => {
-//            config_file_path.push_str(&x);
-//        }
-//        Err(err) => {
-//            eprintln!("{err}");
-//        }
-//    }
+    let config_folder = format!("{}/alias-config", home_path);
+    let create_dir_fn = fs::create_dir(&config_folder);
+    let config_path = Path::new(&config_folder);
 
-//    config_file_path.push_str("/.workspace-alias");
+    if !config_path.exists() {
+        match create_dir_fn {
+            Ok(_) => {
+                let msg = "Created Config Folder Succeffully".color(Color::Green);
+                println!("{msg}");
+            }
+            Err(err) => {
+                let msg = "Failed to get home path".color(Color::Red);
+                eprintln!("{msg}, {err}");
+            }
+        }
+    } else {
+        let msg = "Config Path Already Exists".color(Color::Yellow);
+        println!("{msg}");
+    }
 
-//    println!("{config_file_path}");
+    // Create config.json
+    let config_json = config_path.join("config.json");
 
-//    // return config_file_path;
-//    let path_exists = Path::new(&config_file_path).exists();
+    let mut json_file = match File::create(&config_json) {
+        Ok(file_to_write) => file_to_write,
+        Err(err) => {
+            let msg = "failed to get home path".color(Color::Red);
+            eprintln!("{msg}, {err}");
+            return;
+        }
+    };
 
-//    if !path_exists {
-//        // Path doesn't exist
-//        match File::create(&config_file_path) {
-//            Ok(_) => {
-//                println!("Created Config file path at {}", config_file_path);
-//            }
-//            Err(err) => {
-//                eprintln!("Failed to create config file path {err}");
-//            }
-//        }
-//    } else {
-//        println!("Config file already exists {config_file_path}");
-//    }
-// }
+    // Fetch config file from github
+    match json_file.write_all(b"{}") {
+        Ok(_) => {
+            let msg = "Created Config Folder Succeffully".color(Color::Green);
+            println!("{msg}");
+        }
+        Err(err) => {
+            let msg = "Failed to Write config.json".color(Color::Red);
+            eprintln!("{msg}, {err}");
+        }
+    }
+}
