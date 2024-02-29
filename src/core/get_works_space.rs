@@ -22,7 +22,7 @@ pub fn get_workspace() -> Result<Alias, WorkspaceError> {
     let lines = ls_output.split("\n");
 
     // Output of `ls` end's with an empty string i know I could have probably spliced but...
-    let non_empty_results: Vec<String> = lines
+    let _non_empty_results: Vec<String> = lines
         .filter_map(|line| {
             if !line.is_empty() {
                 // Output isn't empty
@@ -41,10 +41,6 @@ pub fn get_workspace() -> Result<Alias, WorkspaceError> {
             }
         })
         .collect();
-
-    // println!("ALL: {:?}", non_empty_results);
-    // println!("Only Files: {:?}", files);
-    // println!("Only Dirs: {:?}", directories);
 
     if files.contains(&"cargo.toml".to_string()) || files.contains(&"cargo.lock".to_string()) {
         _workspace = "rust".to_string();
