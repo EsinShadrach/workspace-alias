@@ -38,6 +38,8 @@ pub async fn create_config_file() {
                     let mut shell_config_file = String::new();
                     let mut reader = BufReader::new(file);
                     let read_file_string = reader.read_to_string(&mut shell_config_file);
+                    let alias_config_path = format!("{home_path}/alias-thing");
+                    config_operation(Path::new(&alias_config_path)).await;
 
                     match read_file_string {
                         Ok(_) => {
@@ -54,12 +56,8 @@ pub async fn create_config_file() {
                                 println!("{fail_msg}");
                                 create_alias_in_shell(&config_path);
                             } else {
-                                let check = &check_mark();
                                 println!("{} Alias for alias-thing found", check);
                             }
-
-                            let alias_config_path = format!("{home_path}/alias-thing");
-                            config_operation(Path::new(&alias_config_path)).await;
                         }
                         Err(err) => {
                             let fail_msg = format!("{icon_cancel} Failed to Read `SHELL` {err}")
@@ -117,6 +115,8 @@ fn get_shell() -> Result<String, WorkspaceError> {
 }
 
 fn create_alias_in_shell(shell_path: &Path) {
+    // Get alias-thing directory
+    // make it the path for write
     let alias = "source ~/alias-config/.workspace_alias && call_binary_here";
     let alias_line = format!("alias alias-thing = \"{alias}\"");
     let icon_cancel = cancel_icon();
