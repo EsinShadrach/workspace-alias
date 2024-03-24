@@ -1,7 +1,8 @@
 use colorful::{Color, Colorful};
+use reqwest::Error;
 use std::{
-    env,
-    fs::{File, OpenOptions},
+    env::{self},
+    fs::{self, File, OpenOptions},
     io::{BufReader, Read, Write},
     path::Path,
 };
@@ -12,6 +13,8 @@ use crate::{
 };
 
 pub async fn create_config_file() {
+    let icon_cancel = &cancel_icon();
+
     match env::var("HOME") {
         Ok(home_path) => {
             let check = &check_mark();
@@ -27,7 +30,7 @@ pub async fn create_config_file() {
                     let file = match File::open(config_path) {
                         Ok(file) => file,
                         Err(err) => {
-                            eprintln!("{} Error opening file: {}", cancel_icon(), err);
+                            eprintln!("{} Error opening file: {}", icon_cancel, err);
                             return;
                         }
                     };
@@ -44,7 +47,6 @@ pub async fn create_config_file() {
                                 .collect();
 
                             if has_alias.is_empty() {
-                                let icon_cancel = cancel_icon();
                                 let fail_msg =
                                     format!("{icon_cancel} No Alias for alias-thing found")
                                         .color(Color::Red)
@@ -55,9 +57,11 @@ pub async fn create_config_file() {
                                 let check = &check_mark();
                                 println!("{} Alias for alias-thing found", check);
                             }
+
+                            let alias_config_path = format!("{home_path}/alias-thing");
+                            config_operation(Path::new(&alias_config_path)).await;
                         }
                         Err(err) => {
-                            let icon_cancel = cancel_icon();
                             let fail_msg = format!("{icon_cancel} Failed to Read `SHELL` {err}")
                                 .color(Color::Red)
                                 .bold();
@@ -67,7 +71,6 @@ pub async fn create_config_file() {
                     }
                 }
                 Err(err) => {
-                    let icon_cancel = cancel_icon();
                     let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
                         .color(Color::Red)
                         .bold();
@@ -116,6 +119,7 @@ fn get_shell() -> Result<String, WorkspaceError> {
 fn create_alias_in_shell(shell_path: &Path) {
     let alias = "source ~/alias-config/.workspace_alias && call_binary_here";
     let alias_line = format!("alias alias-thing = \"{alias}\"");
+    let icon_cancel = cancel_icon();
 
     let file = OpenOptions::new().write(true).append(true).open(shell_path);
     match file {
@@ -127,7 +131,6 @@ fn create_alias_in_shell(shell_path: &Path) {
                     println!("{} alias alias-thing written", check);
                 }
                 Err(err) => {
-                    let icon_cancel = cancel_icon();
                     let fail_msg = format!(
                         "{icon_cancel} Failed to add alias to {:?} {err}",
                         Some(shell_path).expect("failed to get path")
@@ -139,7 +142,6 @@ fn create_alias_in_shell(shell_path: &Path) {
             }
         }
         Err(err) => {
-            let icon_cancel = cancel_icon();
             let fail_msg = format!(
                 "{icon_cancel} Failed to open to add alias {:?} {err}",
                 Some(shell_path).expect("failed to get path")
@@ -151,115 +153,108 @@ fn create_alias_in_shell(shell_path: &Path) {
     }
 }
 
-/*
- * - Read ZSH config
- * if command alias-thing doesn't exist and folder alias-thing doesn't exist
- * - Create alias-thing folder, pull json config
- * - add "alias-thing --init" to so and call binary to get workspace configurations
- * */
+async fn config_operation(alias_config_path: &Path) {
+    let check = &check_mark();
+    let icon_cancel = cancel_icon();
+    let aliases_store = alias_config_path.join(".workspace-alias");
+    let config_json = alias_config_path.join("config.json");
 
-// let home_path = match env::var("HOME") {
-//     Ok(path) => path,
-//     Err(err) => {
-//         let msg = "Failed to get home path".color(Color::Red);
-//         eprintln!("{msg}, {err}");
-//         return;
-//     }
-// };
+    if !alias_config_path.exists() {
+        match fs::create_dir(alias_config_path) {
+            Ok(_) => {
+                println!("{} alias-thing directory created", check);
+            }
+            Err(err) => {
+                let icon_cancel = cancel_icon();
+                let fail_msg = format!(
+                    "{icon_cancel} Failed to Create Directory to add alias {:?} {err}",
+                    Some(alias_config_path).expect("failed to get path")
+                )
+                .color(Color::Red)
+                .bold();
+                eprintln!("{fail_msg}");
+            }
+        }
+    }
 
-// let config_folder = format!("{}/alias-config", home_path);
-// let create_dir_fn = fs::create_dir(&config_folder);
-// let config_path = Path::new(&config_folder);
+    if aliases_store.exists() {
+        let exclamation_mark = "!".color(Color::Yellow);
+        let msg = ".workspace_alias Already Exists".color(Color::Yellow);
+        println!("{exclamation_mark} {msg}");
+    } else {
+        println!("{} no .workspace_alias file found", icon_cancel);
+        match File::create(&aliases_store) {
+            Ok(mut xr) => {
+                match xr.write(b"# Workspace Aliases") {
+                    Ok(_) => {
+                        let msg = format!("{check} Written .workspace_alias");
+                        println!("{msg}");
+                    }
+                    Err(err) => {
+                        let msg = format!("{icon_cancel} Failed to create .workspace_alias")
+                            .color(Color::Red);
+                        println!("{msg}");
 
-// if !config_path.exists() {
-//     match create_dir_fn {
-//         Ok(_) => {
-//             let msg = "Created Config Folder Succeffully".color(Color::Green);
-//             println!("{msg}");
-//         }
-//         Err(err) => {
-//             let msg = "Failed to get home path".color(Color::Red);
-//             eprintln!("{msg}, {err}");
-//         }
-//     }
-// } else {
-//     let msg = "Config Path Already Exists".color(Color::Yellow);
-//     println!("{msg}");
-// }
+                        eprintln!("{err}")
+                    }
+                };
+            }
+            Err(err) => {
+                let msg =
+                    format!("{icon_cancel} Failed to create .workspace_alias").color(Color::Red);
+                println!("{msg}");
 
-// // Create config.json
-// let config_json = config_path.join("config.json");
-// let alias_config_file = config_path.join(".workspace_alias");
+                eprintln!("{err}")
+            }
+        }
+    }
 
-// if config_json.exists() {
-//     let msg = "config.json Already Exists".color(Color::Yellow);
-//     println!("{msg}");
-// } else {
-//     let mut json_file = match File::create(&config_json) {
-//         Ok(file_to_write) => file_to_write,
-//         Err(err) => {
-//             let msg = "Failed to create json".color(Color::Red);
-//             eprintln!("{msg}, {err}");
-//             return;
-//         }
-//     };
+    if config_json.exists() {
+        let msg = "! config.json Already Exists".color(Color::Yellow);
+        println!("{msg}");
+    } else {
+        let config_json_response = match fetch_config().await {
+            Ok(json) => json,
+            Err(err) => {
+                let msg = format!("{icon_cancel} Failed to Fetch config.json").color(Color::Red);
+                println!("{msg}");
+                eprintln!("{err}");
+                return;
+            }
+        };
+        let mut json_file = match File::create(&config_json) {
+            Ok(file_to_write) => file_to_write,
+            Err(err) => {
+                let msg = "Failed to create json".color(Color::Red);
+                eprintln!("{msg}, {err}");
+                return;
+            }
+        };
 
-//     let val = async {
-//         let config_req = reqwest::get(
-//             "https://raw.githubusercontent.com/EsinShadrach/workspace-alias/main/config.json",
-//         )
-//         .await;
+        match json_file.write_all(config_json_response.as_bytes()) {
+            Ok(_) => {
+                let msg = format!(
+                    "{} Created {} {}",
+                    check_mark(),
+                    "config.json".bold(),
+                    "Succeffully".color(Color::Green)
+                )
+                .color(Color::Green);
+                println!("{msg}");
+            }
+            Err(err) => {
+                let msg = "Failed to Write config.json".color(Color::Red);
+                eprintln!("{msg}, {err}");
+            }
+        }
+    }
+}
 
-//         match config_req {
-//             Ok(okay) => {
-//                 let json_text = okay.text().await.expect("Failed to read okay text");
-//                 return json_text;
-//             }
-//             Err(err) => {
-//                 let msg = "Failed to Write config.json".color(Color::Red);
-//                 let err_msg = format!("{msg}, {err}");
-//                 panic!("{err_msg}");
-//             }
-//         }
-//     }
-//     .await;
+async fn fetch_config() -> Result<String, Error> {
+    let config_req = reqwest::get(
+        "https://raw.githubusercontent.com/EsinShadrach/workspace-alias/main/config.json",
+    )
+    .await?;
 
-//     match json_file.write_all(val.as_bytes()) {
-//         Ok(_) => {
-//             let msg = format!(
-//                 "Created {} {}",
-//                 "config.json".bold(),
-//                 "Succeffully".color(Color::Green)
-//             )
-//             .color(Color::Green);
-//             println!("{msg}");
-//         }
-//         Err(err) => {
-//             let msg = "Failed to Write config.json".color(Color::Red);
-//             eprintln!("{msg}, {err}");
-//         }
-//     }
-// }
-
-// if alias_config_file.exists() {
-//     let msg = ".workspace_alias Already Exists".color(Color::Yellow);
-//     println!("{msg}");
-//     return;
-// }
-
-// match File::create(&alias_config_file) {
-//     Ok(mut x) => {
-//         let fail_msg = format!(
-//             "{}",
-//             "Failed to write Workspace_alias to disk".color(Color::Red)
-//         );
-//         let success_msg = format!("Written .workspace_alias to disk").color(Color::Green);
-
-//         println!("{success_msg}");
-//         x.write(b"apples are red").expect(&fail_msg);
-//     }
-//     Err(err) => {
-//         let msg = "Failed to Write alias file".color(Color::Red);
-//         eprintln!("{msg}, {err}");
-//     }
-// };
+    Ok(config_req.text().await?)
+}
