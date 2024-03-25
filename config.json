@@ -1,58 +1,61 @@
 {
-  "$schema": "https://raw.githubusercontent.com/EsinShadrach/assets/main/workspace-alias/schema.json",
+  "$schema": "./schema.json",
   "languages": {
-    "rust": {
-      "name": "Rust",
-      "type": "rust",
-      "file_match": ["Cargo.toml", "Cargo.lock"],
-      "commands": ["cargo build", "cargo run", "cargo test", "cargo check"],
+    "flutter": {
       "command_alias": {
-        "build": "cargo build",
-        "run": "cargo run",
-        "test": "cargo test",
-        "check": "cargo check"
-      }
+        "clean": "flutter clean",
+        "install": "flutter pub get",
+        "run": "flutter run",
+        "test": "flutter test"
+      },
+      "commands": ["flutter pub get", "flutter run", "flutter test"],
+      "dir_match": ["lib"],
+      "file_match": ["pubspec.yaml"],
+      "name": "Flutter",
+      "type": "flutter"
     },
-
     "go": {
-      "name": "Go",
-      "type": "go",
-      "file_match": ["go.mod", "go.sum"],
-      "commands": ["go build", "go run", "go test"],
       "command_alias": {
         "build": "go build",
         "run": "go run",
         "test": "go test"
-      }
+      },
+      "commands": ["go build", "go run", "go test"],
+      "dir_match": ["vendor"],
+      "file_match": ["go.mod", "go.sum"],
+      "name": "Go",
+      "type": "go"
     },
     "python": {
-      "name": "Python",
-      "type": "python",
-      "file_match": ["requirements.txt", "Pipfile", "Pipfile.lock"],
+      "command_alias": {
+        "install": "python3 -m pip install -r requirements.txt",
+        "install-dev": "python3 -m pipenv install",
+        "run": "python3 -m pipenv run python3",
+        "test": "python3 -m pipenv run python3 -m pytest"
+      },
       "commands": [
         "python3 -m pip install -r requirements.txt",
         "python3 -m pipenv install",
         "python3 -m pipenv run python3",
         "python3 -m pipenv run python3 -m pytest"
       ],
-      "command_alias": {
-        "install": "python3 -m pip install -r requirements.txt",
-        "install-dev": "python3 -m pipenv install",
-        "run": "python3 -m pipenv run python3",
-        "test": "python3 -m pipenv run python3 -m pytest"
-      }
+      "dir_match": [".venv", ".env"],
+      "file_match": ["requirements.txt", "Pipfile", "Pipfile.lock"],
+      "name": "Python",
+      "type": "python"
     },
-    "flutter": {
-      "name": "Flutter",
-      "type": "flutter",
-      "file_match": ["pubspec.yaml"],
-      "commands": ["flutter pub get", "flutter run", "flutter test"],
+    "rust": {
       "command_alias": {
-        "install": "flutter pub get",
-        "run": "flutter run",
-        "test": "flutter test",
-        "clean": "flutter clean"
-      }
+        "build": "cargo build",
+        "check": "cargo check",
+        "run": "cargo run",
+        "test": "cargo test"
+      },
+      "commands": ["cargo build", "cargo run", "cargo test", "cargo check"],
+      "dir_match": ["target", "src"],
+      "file_match": ["Cargo.toml", "Cargo.lock"],
+      "name": "Rust",
+      "type": "rust"
     }
   }
 }
