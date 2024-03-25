@@ -179,7 +179,7 @@ async fn config_operation(alias_config_path: &Path) {
 
     if aliases_store.exists() {
         let exclamation_mark = "!".color(Color::Yellow);
-        let msg = ".workspace_alias Already Exists".color(Color::Yellow);
+        let msg = ".workspace_alias Already Exists";
         println!("{exclamation_mark} {msg}");
     } else {
         println!("{} no .workspace_alias file found", icon_cancel);
@@ -210,8 +210,9 @@ async fn config_operation(alias_config_path: &Path) {
     }
 
     if config_json.exists() {
-        let msg = "! config.json Already Exists".color(Color::Yellow);
-        println!("{msg}");
+        let exclamation_mark = "!".color(Color::Yellow);
+        let msg = "config.json Already Exists";
+        println!("{exclamation_mark} {msg}");
     } else {
         let config_json_response = match fetch_config().await {
             Ok(json) => json,
@@ -248,6 +249,7 @@ async fn config_operation(alias_config_path: &Path) {
             }
         }
     }
+    determine_workspace(&aliases_store, &config_json);
 }
 
 async fn fetch_config() -> Result<String, Error> {
@@ -257,4 +259,54 @@ async fn fetch_config() -> Result<String, Error> {
     .await?;
 
     Ok(config_req.text().await?)
+}
+
+fn determine_workspace(workspace_config: &Path, config_json: &Path) {
+    // TODO: Use these
+    let _ = config_json;
+    let _ = workspace_config;
+    let icon_cancel = cancel_icon();
+
+    let current_dir = match env::current_dir() {
+        Ok(xr) => {
+            let check = &check_mark();
+            println!("{} Reading Current Directory", check);
+            xr
+        }
+        Err(err) => {
+            let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
+                .color(Color::Red)
+                .bold();
+            eprintln!("{fail_msg}");
+            return;
+        }
+    };
+
+    let entries = match fs::read_dir(&current_dir) {
+        Ok(data) => {
+            let check = &check_mark();
+            println!("{} Reading Files in current directory", check);
+            data
+        }
+        Err(err) => {
+            let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
+                .color(Color::Red)
+                .bold();
+            eprintln!("{fail_msg}");
+            return;
+        }
+    };
+
+    for entry in entries.into_iter() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if path.is_file() {
+            println!("File: {}", path.display());
+        }
+
+        if path.is_dir() {
+            println!("Directory: {}", path.display());
+        }
+    }
 }
