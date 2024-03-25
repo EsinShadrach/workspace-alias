@@ -30,18 +30,8 @@ impl fmt::Display for Alias {
         write!(f, "Alias: {}, Command: {}", self.alias, self.command)
     }
 }
+
 #[tokio::main]
 async fn main() {
     create_config_file().await;
-
-    // match get_workspace() {
-    //     Ok(_original_alias) => {
-    //         // println!("{:?}", original_alias);
-    //         // create_alias(&original_alias);
-    //         // create_config_file();
-    //     }
-    //     Err(err) => {
-    //         eprintln!("Error: {}", err);
-    //     }
-    // }
 }
