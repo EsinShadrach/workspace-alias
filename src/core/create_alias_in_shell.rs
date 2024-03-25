@@ -4,11 +4,11 @@ use std::{fs::OpenOptions, io::Write, path::Path};
 
 use crate::utils::useful_utils::{cancel_icon, check_mark};
 
-pub fn create_alias_in_shell(shell_path: &Path) {
+pub fn create_alias_in_shell(shell_path: &Path, alias_config_path: String) {
     // Get alias-thing directory
     // make it the path for write
-    let alias = "source ~/alias-config/.workspace_alias && call_binary_here";
-    let alias_line = format!("alias alias-thing = \"{alias}\"");
+    let alias = format!("source {alias_config_path}/.workspace-alias");
+    let alias_line = format!("alias alias-thing=\"{alias}\"");
     let icon_cancel = cancel_icon();
 
     let file = OpenOptions::new().write(true).append(true).open(shell_path);

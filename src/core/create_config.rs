@@ -57,7 +57,7 @@ pub async fn create_config_file() {
                                         .color(Color::Red)
                                         .bold();
                                 println!("{fail_msg}");
-                                create_alias_in_shell(&config_path);
+                                create_alias_in_shell(&config_path, alias_config_path);
                             } else {
                                 println!("{} Alias for alias-thing found", check);
                             }

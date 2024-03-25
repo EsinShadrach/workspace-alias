@@ -14,6 +14,7 @@ pub struct LanguageConfig {
     name: String,
     // the r#type means raw string so it means `type`
     r#type: String,
+    pub dir_match: Vec<String>, // New field for directory matches
     pub file_match: Vec<String>,
     commands: Vec<String>,
     pub command_alias: HashMap<String, String>,
@@ -28,7 +29,7 @@ pub fn create_lang_map(
     let json_to_struct = match json_to_struct {
         Ok(xr) => xr,
         Err(err) => {
-            let msg = "Failed to open config file";
+            let msg = "Failed to open config file to parse";
             println!("{} {} {}", icon_cancel, msg, err);
             return Err(WorkspaceError::CommandFailed);
         }

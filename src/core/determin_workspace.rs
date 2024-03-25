@@ -1,6 +1,7 @@
 use colorful::{Color, Colorful};
 
 use std::{
+    collections::HashMap,
     env::{self},
     fs::{self, File},
     io::Read,
@@ -13,7 +14,7 @@ use crate::{
 };
 
 pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
-    let config_lang = String::from("javascript");
+    let mut config_lang = String::new();
     let _ = workspace_config;
     let icon_cancel = cancel_icon();
 
@@ -31,41 +32,6 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
             return;
         }
     };
-
-    let entries = match fs::read_dir(&current_dir) {
-        Ok(data) => {
-            let check = &check_mark();
-            println!("{} Reading Files in current directory", check);
-            data
-        }
-        Err(err) => {
-            let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
-                .color(Color::Red)
-                .bold();
-            eprintln!("{fail_msg}");
-            return;
-        }
-    };
-
-    for entry in entries.into_iter() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-
-        if path.is_file() {
-            println!("File: {}", path.display());
-        }
-
-        if path.is_dir() {
-            println!("Directory: {}", path.display());
-        }
-    }
-
-    println!(
-        "\n{} Config Map for {} {}\n",
-        "=".repeat(6),
-        config_lang.to_uppercase(),
-        "=".repeat(10)
-    );
 
     let config_json_str = match File::open(config_json) {
         Ok(mut file_data) => {
@@ -91,6 +57,69 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
         }
     };
 
+    let entries = match fs::read_dir(&current_dir) {
+        Ok(data) => {
+            let check = &check_mark();
+            println!("{} Reading Files in current directory", check);
+            data
+        }
+        Err(err) => {
+            let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
+                .color(Color::Red)
+                .bold();
+            eprintln!("{fail_msg}");
+            return;
+        }
+    };
+
+    let mut match_scores: HashMap<&String, usize> = HashMap::new();
+    let mut _match_count = 0;
+
+    for entry in entries.into_iter() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if path.is_file() {
+            let relative_file_name = entry.file_name();
+            let file_name = relative_file_name.to_str().unwrap();
+            let mut file_matched = false;
+
+            for (lang, config_for_lang) in &language_map {
+                let matching_files = config_for_lang.file_match.iter().any(|pattern| {
+                    let lowercase_pattern = pattern.to_lowercase();
+                    let lowercase_file_name = file_name.to_lowercase();
+                    return lowercase_pattern == lowercase_file_name;
+                });
+
+                if matching_files {
+                    file_matched = true;
+                    *match_scores.entry(lang).or_insert(0) += 1;
+                }
+            }
+
+            if file_matched {
+                _match_count += 1;
+            }
+        }
+    }
+
+    let weights = match_scores.iter().max_by_key(|(_, score)| *score);
+
+    match weights {
+        Some((most_seen, score)) => {
+            config_lang = most_seen.to_string();
+            println!("- Matched {most_seen} by file_check {score} times")
+        }
+        None => (),
+    }
+
+    println!(
+        "\n{} Config for {} {}\n",
+        "=".repeat(6),
+        config_lang.to_uppercase(),
+        "=".repeat(10)
+    );
+
     let language = language_map.get(&config_lang);
 
     let language = match language {
@@ -105,5 +134,9 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
         }
     };
 
-    println!("{:?}", language.command_alias);
+    // TODO: Write to .workspace-alias here
+    language
+        .command_alias
+        .iter()
+        .for_each(|(alias, command)| println!("Alias {alias} added for command {command}"));
 }
