@@ -1,9 +1,7 @@
 use colorful::{Color, Colorful};
 use reqwest::Error;
-use serde::{Deserialize, Serialize};
-use serde_json;
+
 use std::{
-    collections::HashMap,
     env::{self},
     fs::{self, File, OpenOptions},
     io::{BufReader, Read, Write},
@@ -11,6 +9,7 @@ use std::{
 };
 
 use crate::{
+    core::create_lang_map::create_lang_map,
     utils::useful_utils::{cancel_icon, check_mark},
     WorkspaceError,
 };
@@ -358,38 +357,4 @@ fn determine_workspace(workspace_config: &Path, config_json: &Path) {
     };
 
     println!("{:?}", language.command_alias);
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Config {
-    languages: HashMap<String, LanguageConfig>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct LanguageConfig {
-    name: String,
-    // the r#type means raw string so it means `type`
-    r#type: String,
-    file_match: Vec<String>,
-    commands: Vec<String>,
-    command_alias: HashMap<String, String>,
-}
-
-fn create_lang_map(
-    config_json_str: &str,
-) -> Result<HashMap<String, LanguageConfig>, WorkspaceError> {
-    let icon_cancel = cancel_icon();
-    let json_to_struct = serde_json::from_str::<Config>(config_json_str);
-
-    let json_to_struct = match json_to_struct {
-        Ok(xr) => xr,
-        Err(err) => {
-            let msg = "Failed to open config file";
-            println!("{} {} {}", icon_cancel, msg, err);
-            return Err(WorkspaceError::CommandFailed);
-        }
-    };
-    let languages = json_to_struct.languages;
-
-    return Ok(languages);
 }
