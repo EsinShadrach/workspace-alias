@@ -1,6 +1,9 @@
 use colorful::{Color, Colorful};
 use reqwest::Error;
+use serde::{Deserialize, Serialize};
+use serde_json;
 use std::{
+    collections::HashMap,
     env::{self},
     fs::{self, File, OpenOptions},
     io::{BufReader, Read, Write},
@@ -262,16 +265,15 @@ async fn fetch_config() -> Result<String, Error> {
 }
 
 fn determine_workspace(workspace_config: &Path, config_json: &Path) {
-    // TODO: Use these
-    let _ = config_json;
+    let config_lang = String::from("javascript");
     let _ = workspace_config;
     let icon_cancel = cancel_icon();
 
     let current_dir = match env::current_dir() {
-        Ok(xr) => {
+        Ok(c_dir) => {
             let check = &check_mark();
             println!("{} Reading Current Directory", check);
-            xr
+            c_dir
         }
         Err(err) => {
             let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
@@ -309,4 +311,85 @@ fn determine_workspace(workspace_config: &Path, config_json: &Path) {
             println!("Directory: {}", path.display());
         }
     }
+
+    println!(
+        "\n{} Config Map for {} {}\n",
+        "=".repeat(6),
+        config_lang.to_uppercase(),
+        "=".repeat(10)
+    );
+
+    let config_json_str = match File::open(config_json) {
+        Ok(mut file_data) => {
+            let mut data = String::new();
+            let failure_to_read = format!("{icon_cancel} Failed to read JSON config");
+            file_data.read_to_string(&mut data).expect(&failure_to_read);
+            data
+        }
+        Err(err) => {
+            let msg = "failed to open config file";
+            println!("{} {} {}", icon_cancel, msg, err);
+            return;
+        }
+    };
+
+    let language_map = create_lang_map(&config_json_str);
+    let language_map = match language_map {
+        Ok(l_map) => l_map,
+        Err(err) => {
+            let msg = "Failed to open config file";
+            println!("{} {} {}", icon_cancel, msg, err);
+            return;
+        }
+    };
+
+    let language = language_map.get(&config_lang);
+
+    let language = match language {
+        Some(lang) => lang,
+        None => {
+            let msg = format!(
+                "Language Config not found, try adding it in {}",
+                config_json.display()
+            );
+            println!("{} {}", icon_cancel, msg);
+            return;
+        }
+    };
+
+    println!("{:?}", language.command_alias);
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Config {
+    languages: HashMap<String, LanguageConfig>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct LanguageConfig {
+    name: String,
+    // the r#type means raw string so it means `type`
+    r#type: String,
+    file_match: Vec<String>,
+    commands: Vec<String>,
+    command_alias: HashMap<String, String>,
+}
+
+fn create_lang_map(
+    config_json_str: &str,
+) -> Result<HashMap<String, LanguageConfig>, WorkspaceError> {
+    let icon_cancel = cancel_icon();
+    let json_to_struct = serde_json::from_str::<Config>(config_json_str);
+
+    let json_to_struct = match json_to_struct {
+        Ok(xr) => xr,
+        Err(err) => {
+            let msg = "Failed to open config file";
+            println!("{} {} {}", icon_cancel, msg, err);
+            return Err(WorkspaceError::CommandFailed);
+        }
+    };
+    let languages = json_to_struct.languages;
+
+    return Ok(languages);
 }
