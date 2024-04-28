@@ -12,6 +12,8 @@ init function to create alias-thing folder in root dir with
 
 ## TODO
 
-- [ ] Create Config file and json
-- [ ] Check if it exists
-- [ ] shell script or something to add the config.txt source to the ~/.zshrc or bashrc
+- [x] Create Config file and json
+- [x] Check if it exists
+- [x] shell script or something to add the config.txt source to the ~/.zshrc or bashrc
+- [ ] Edit shell to include `alias-thing` to init alias-thing
+- [ ] Determine the repo environment and create commands based off that
