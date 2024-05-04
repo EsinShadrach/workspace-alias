@@ -26,15 +26,11 @@ pub struct Alias {
     command: String,
 }
 
-//todo!("Implement from to create alias");
-// impl From<&Alias> for Alias {
-//     fn from(data: &Alias) -> Alias {
-//         Alias {
-//             alias: data.alias,
-//             command: data.command,
-//         }
-//     }
-// }
+impl Alias {
+    pub fn to_alias_format(&self) -> String {
+        return format!("alias {}=\"{}\"", self.alias, self.command);
+    }
+}
 
 impl fmt::Display for Alias {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

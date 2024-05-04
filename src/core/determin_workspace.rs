@@ -9,7 +9,7 @@ use std::{
 use crate::{
     core::create_lang_map::create_lang_map,
     utils::{log_err_msg::create_error_msg, useful_utils::check_mark},
-    LogErrorMsg,
+    Alias, LogErrorMsg,
 };
 
 pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
@@ -142,8 +142,12 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
     let mut to_write = String::new();
     language.command_alias.iter().for_each(|(alias, command)| {
         println!("Alias {alias} added for command {command}");
+        let formatted = Alias {
+            alias: alias.to_string(),
+            command: command.to_string(),
+        };
         // alias run="cargo run"
-        let create_alias = format!("alias {alias}=\"{command}\"\n");
+        let create_alias = formatted.to_alias_format();
         to_write.push_str(&create_alias);
     });
 
