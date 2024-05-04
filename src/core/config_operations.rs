@@ -110,6 +110,32 @@ pub async fn config_operation(alias_config_path: &Path) {
     determine_workspace(&aliases_store, &config_json);
 }
 
+/// Fetches the configuration from a remote URL.
+///
+/// This asynchronous function fetches the configuration from a remote URL and returns it as a string.
+///
+/// # Errors
+///
+/// This function returns an error if the HTTP request fails or if there's an error while processing the response.
+///
+/// # Returns
+///
+/// A [`Result`] containing the fetched configuration as a string if successful, or an error if the request fails.
+///
+/// # Examples
+///
+/// ```
+/// use crate::fetch_config;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     match fetch_config().await {
+///         Ok(config) => println!("Fetched configuration: {}", config),
+///         Err(err) => eprintln!("Error fetching configuration: {:?}", err),
+///     }
+/// }
+/// ```
+///
 async fn fetch_config() -> Result<String, Error> {
     let config_req = reqwest::get(
         "https://raw.githubusercontent.com/EsinShadrach/workspace-alias/main/config.json",
