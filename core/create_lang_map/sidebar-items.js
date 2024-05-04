@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["create_lang_map"],"struct":["Config","LanguageConfig"]};

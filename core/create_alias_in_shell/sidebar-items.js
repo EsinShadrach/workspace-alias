@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["create_alias_in_shell"]};
