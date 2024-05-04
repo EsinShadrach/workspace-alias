@@ -15,5 +15,12 @@ init function to create alias-thing folder in root dir with
 - [x] Create Config file and json
 - [x] Check if it exists
 - [x] shell script or something to add the config.txt source to the ~/.zshrc or bashrc
-- [ ] Edit shell to include `alias-thing` to init alias-thing
-- [ ] Determine the repo environment and create commands based off that
+- [x] Edit shell to include `alias-thing` to init alias-thing
+- [x] Determine the repo environment and create commands based off that
+- [ ] Implement from feature for Alias struct
+- [ ] Method to list available aliases
+- [ ] command to run this binary
+
+# Fixes
+
+- Fix error in src/utils/get_alias_config.rs

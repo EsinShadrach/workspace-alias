@@ -1,5 +1,3 @@
-use colorful::{Color, Colorful};
-
 use std::{
     env::{self},
     fs::File,
@@ -11,8 +9,10 @@ use crate::{
     core::{config_operations::config_operation, create_alias_in_shell::create_alias_in_shell},
     utils::{
         get_shell::get_shell,
+        log_err_msg::create_error_msg,
         useful_utils::{cancel_icon, check_mark},
     },
+    LogErrorMsg,
 };
 
 pub async fn create_config_file() {
@@ -52,38 +52,37 @@ pub async fn create_config_file() {
                                 .collect();
 
                             if has_alias.is_empty() {
-                                let fail_msg =
-                                    format!("{icon_cancel} No Alias for alias-thing found")
-                                        .color(Color::Red)
-                                        .bold();
-                                println!("{fail_msg}");
+                                create_error_msg(LogErrorMsg {
+                                    msg: "No Alias for alias-thing found".to_owned(),
+                                    err: String::new(),
+                                });
                                 create_alias_in_shell(&config_path, alias_config_path);
                             } else {
                                 println!("{} Alias for alias-thing found", check);
                             }
                         }
                         Err(err) => {
-                            let fail_msg = format!("{icon_cancel} Failed to Read `SHELL` {err}")
-                                .color(Color::Red)
-                                .bold();
-                            eprintln!("{fail_msg}");
+                            create_error_msg(LogErrorMsg {
+                                msg: "Failed to Read `SHELL`".to_owned(),
+                                err: err.to_string(),
+                            });
                             return;
                         }
                     }
                 }
                 Err(err) => {
-                    let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
-                        .color(Color::Red)
-                        .bold();
-                    eprintln!("{fail_msg}");
+                    create_error_msg(LogErrorMsg {
+                        msg: "Failed to get `SHELL`".to_owned(),
+                        err: err.to_string(),
+                    });
                 }
             }
         }
         Err(err) => {
-            let fail_msg = format!("Failed to get `HOME` path {err}")
-                .color(Color::Red)
-                .bold();
-            eprintln!("{fail_msg}")
+            create_error_msg(LogErrorMsg {
+                msg: "Failed to get `HOME` path".to_owned(),
+                err: err.to_string(),
+            });
         }
     }
 }

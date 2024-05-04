@@ -3,14 +3,18 @@ use colorful::{Color, Colorful};
 use std::{
     collections::HashMap,
     env::{self},
-    fs::{self, File},
-    io::Read,
+    fs::{self, File, OpenOptions},
+    io::{Read, Write},
     path::Path,
 };
 
 use crate::{
     core::create_lang_map::create_lang_map,
-    utils::useful_utils::{cancel_icon, check_mark},
+    utils::{
+        log_err_msg::create_error_msg,
+        useful_utils::{cancel_icon, check_mark},
+    },
+    LogErrorMsg,
 };
 
 pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
@@ -117,7 +121,7 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
         "\n{} Config for {} {}\n",
         "=".repeat(6),
         config_lang.to_uppercase(),
-        "=".repeat(10)
+        "=".repeat(6)
     );
 
     let language = language_map.get(&config_lang);
@@ -135,8 +139,60 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
     };
 
     // TODO: Write to .workspace-alias here
-    language
-        .command_alias
-        .iter()
-        .for_each(|(alias, command)| println!("Alias {alias} added for command {command}"));
+    // Maybe a String to store the alias so we don't write iteratively
+    let mut to_write = String::new();
+    language.command_alias.iter().for_each(|(alias, command)| {
+        println!("Alias {alias} added for command {command}");
+        // alias run="cargo run"
+        let create_alias = format!("alias {alias}=\"{command}\"\n");
+        to_write.push_str(&create_alias);
+    });
+
+    write_to_alias_config(&to_write);
+}
+
+fn write_to_alias_config(to_write: &str) {
+    let home_dir = match env::var("HOME") {
+        Ok(path) => path,
+
+        Err(err) => {
+            create_error_msg(LogErrorMsg {
+                msg: "Failed to Write Config".to_owned(),
+                err: err.to_string(),
+            });
+            return;
+        }
+    };
+
+    let alias_file = format!("{home_dir}/alias-thing/.workspace-alias");
+    let alias_file_path = Path::new(&alias_file);
+
+    // We have to check if the path exists first before we do anything
+    if alias_file_path.exists() {
+        let file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .open(alias_file_path);
+
+        match file {
+            Ok(mut opened_file) => {
+                let write_results = opened_file.write_all(to_write.as_bytes());
+
+                if let Err(err) = write_results {
+                    let msg = format!("Failed to Write alias");
+                    create_error_msg(LogErrorMsg {
+                        msg,
+                        err: err.to_string(),
+                    });
+                }
+            }
+            Err(err) => {
+                let msg = format!("Failed to open {alias_file}");
+                create_error_msg(LogErrorMsg {
+                    msg,
+                    err: err.to_string(),
+                });
+            }
+        }
+    }
 }

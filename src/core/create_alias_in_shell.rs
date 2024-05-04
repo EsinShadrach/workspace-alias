@@ -1,15 +1,15 @@
-use colorful::{Color, Colorful};
-
 use std::{fs::OpenOptions, io::Write, path::Path};
 
-use crate::utils::useful_utils::{cancel_icon, check_mark};
+use crate::{
+    utils::{log_err_msg::create_error_msg, useful_utils::check_mark},
+    LogErrorMsg,
+};
 
 pub fn create_alias_in_shell(shell_path: &Path, alias_config_path: String) {
     // Get alias-thing directory
     // make it the path for write
     let alias = format!("source {alias_config_path}/.workspace-alias");
     let alias_line = format!("alias alias-thing=\"{alias}\"");
-    let icon_cancel = cancel_icon();
 
     let file = OpenOptions::new().write(true).append(true).open(shell_path);
     match file {
@@ -21,24 +21,18 @@ pub fn create_alias_in_shell(shell_path: &Path, alias_config_path: String) {
                     println!("{} alias alias-thing written", check);
                 }
                 Err(err) => {
-                    let fail_msg = format!(
-                        "{icon_cancel} Failed to add alias to {:?} {err}",
-                        Some(shell_path).expect("failed to get path")
-                    )
-                    .color(Color::Red)
-                    .bold();
-                    eprintln!("{fail_msg}");
+                    create_error_msg(LogErrorMsg {
+                        msg: "Failed to add alias to".to_owned(),
+                        err: err.to_string(),
+                    });
                 }
             }
         }
         Err(err) => {
-            let fail_msg = format!(
-                "{icon_cancel} Failed to open to add alias {:?} {err}",
-                Some(shell_path).expect("failed to get path")
-            )
-            .color(Color::Red)
-            .bold();
-            eprintln!("{fail_msg}");
+            create_error_msg(LogErrorMsg {
+                msg: "Failed to open to add alias".to_owned(),
+                err: err.to_string(),
+            });
         }
     }
 }

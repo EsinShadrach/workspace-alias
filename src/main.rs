@@ -9,6 +9,7 @@ pub enum WorkspaceError {
     CommandFailed,
     DirectoryCheckFailed,
     WriteFailed,
+    FileCheckFailed,
 }
 
 impl fmt::Display for WorkspaceError {
@@ -25,9 +26,31 @@ pub struct Alias {
     command: String,
 }
 
+//todo!("Implement from to create alias");
+// impl From<&Alias> for Alias {
+//     fn from(data: &Alias) -> Alias {
+//         Alias {
+//             alias: data.alias,
+//             command: data.command,
+//         }
+//     }
+// }
+
 impl fmt::Display for Alias {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Alias: {}, Command: {}", self.alias, self.command)
+    }
+}
+
+/// Provides a unifrom structure so i can log error message in `create_error_msg`
+pub struct LogErrorMsg {
+    msg: String,
+    err: String,
+}
+
+impl fmt::Display for LogErrorMsg {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Msg: {}, Error: {}", self.msg, self.err)
     }
 }
 
