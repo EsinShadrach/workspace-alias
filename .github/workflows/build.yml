@@ -30,7 +30,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.RUST }}
-          publish_dir: ./target/doc
+          publish_dir: ./target/doc/alias_thing/index.html
 
       # - name: Create Release
       #   uses: ncipollo/release-action/@v1
