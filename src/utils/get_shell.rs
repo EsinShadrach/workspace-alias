@@ -1,10 +1,8 @@
-use colorful::{Color, Colorful};
-
 use std::env::{self};
 
 use crate::{
-    utils::useful_utils::{cancel_icon, check_mark},
-    WorkspaceError,
+    utils::{log_err_msg::create_error_msg, useful_utils::check_mark},
+    LogErrorMsg, WorkspaceError,
 };
 
 pub fn get_shell() -> Result<String, WorkspaceError> {
@@ -25,11 +23,10 @@ pub fn get_shell() -> Result<String, WorkspaceError> {
             return Ok(shell_path);
         }
         Err(err) => {
-            let icon_cancel = cancel_icon();
-            let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
-                .color(Color::Red)
-                .bold();
-            eprintln!("{fail_msg}");
+            create_error_msg(LogErrorMsg {
+                msg: "Failed to get `SHELL`".to_owned(),
+                err: err.to_string(),
+            });
 
             return Err(WorkspaceError::DirectoryCheckFailed);
         }
