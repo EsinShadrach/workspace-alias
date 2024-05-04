@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["config_operations","create_alias_in_shell","create_config","create_lang_map","determin_workspace"]};

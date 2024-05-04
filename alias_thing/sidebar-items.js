@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["WorkspaceError"],"fn":["main"],"mod":["core","utils"],"struct":["Alias","LogErrorMsg"]};

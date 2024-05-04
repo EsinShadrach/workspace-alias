@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["config_operation","fetch_config"]};
