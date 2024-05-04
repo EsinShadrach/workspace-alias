@@ -1,41 +1,41 @@
 name: Rust
 
 on:
-    push:
-        branches: ["main"]
-    pull_request:
-        branches: ["main"]
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 env:
-    CARGO_TERM_COLOR: always
+  CARGO_TERM_COLOR: always
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Build
-              run: cargo build -r --verbose
+      - name: Build
+        run: cargo build -r --verbose
 
-            - name: Run tests
-              run: cargo test --verbose
+      - name: Run tests
+        run: cargo test --verbose
 
-            - name: Run Docs Clean
-              run: cargo doc --no-deps --document-private-items --document-hidden-items --document-private-items --document-hidden-items --document-all --verbose
+      - name: Run Docs Clean
+        run: cargo doc --no-deps --document-private-items --verbose -r
 
-            # Deploy to github pages
-            - name: Deploy Docs
-              uses: peaceiris/actions-gh-pages@v4
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./target/doc
+      # Deploy to github pages
+      - name: Deploy Docs
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/doc
 
-            - name: Create Release
-              uses: ncipollo/release-action/@v1
-              with:
-                  artifacts: "target/release/alias-thing"
-                  name: alias-thing
-                  tag: v1.0.${{ github.run_number }}
-                  token: ${{ secrets.RUST }}
+      # - name: Create Release
+      #   uses: ncipollo/release-action/@v1
+      #   with:
+      #     artifacts: "target/release/alias-thing"
+      #     name: alias-thing
+      #     tag: v1.0.${{ github.run_number }}
+      #     token: ${{ secrets.RUST }}
