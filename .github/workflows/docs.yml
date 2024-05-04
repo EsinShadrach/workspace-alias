@@ -25,7 +25,7 @@ jobs:
           override: true
 
       - name: Build documentation
-        run: RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps
+        run: RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps --document-private-items --verbose -r
         # uses: actions-rs/cargo@v1
         # with:
         #   command: doc
