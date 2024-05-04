@@ -1,5 +1,3 @@
-use colorful::{Color, Colorful};
-
 use std::{
     collections::HashMap,
     env::{self},
@@ -10,17 +8,13 @@ use std::{
 
 use crate::{
     core::create_lang_map::create_lang_map,
-    utils::{
-        log_err_msg::create_error_msg,
-        useful_utils::{cancel_icon, check_mark},
-    },
+    utils::{log_err_msg::create_error_msg, useful_utils::check_mark},
     LogErrorMsg,
 };
 
 pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
     let mut config_lang = String::new();
     let _ = workspace_config;
-    let icon_cancel = cancel_icon();
 
     let current_dir = match env::current_dir() {
         Ok(c_dir) => {
@@ -29,10 +23,10 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
             c_dir
         }
         Err(err) => {
-            let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
-                .color(Color::Red)
-                .bold();
-            eprintln!("{fail_msg}");
+            create_error_msg(LogErrorMsg {
+                msg: "Failed to get `SHELL`".to_owned(),
+                err: err.to_string(),
+            });
             return;
         }
     };
@@ -40,13 +34,20 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
     let config_json_str = match File::open(config_json) {
         Ok(mut file_data) => {
             let mut data = String::new();
-            let failure_to_read = format!("{icon_cancel} Failed to read JSON config");
-            file_data.read_to_string(&mut data).expect(&failure_to_read);
+            if let Err(err) = file_data.read_to_string(&mut data) {
+                create_error_msg(LogErrorMsg {
+                    msg: "Failed to read JSON config".to_owned(),
+                    err: err.to_string(),
+                });
+                return;
+            }
             data
         }
         Err(err) => {
-            let msg = "failed to open config file";
-            println!("{} {} {}", icon_cancel, msg, err);
+            create_error_msg(LogErrorMsg {
+                msg: "failed to open config file".to_owned(),
+                err: err.to_string(),
+            });
             return;
         }
     };
@@ -55,8 +56,10 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
     let language_map = match language_map {
         Ok(l_map) => l_map,
         Err(err) => {
-            let msg = "Failed to open config file";
-            println!("{} {} {}", icon_cancel, msg, err);
+            create_error_msg(LogErrorMsg {
+                msg: "Failed to open config file".to_owned(),
+                err: err.to_string(),
+            });
             return;
         }
     };
@@ -68,10 +71,10 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
             data
         }
         Err(err) => {
-            let fail_msg = format!("{icon_cancel} Failed to get `SHELL` {err}")
-                .color(Color::Red)
-                .bold();
-            eprintln!("{fail_msg}");
+            create_error_msg(LogErrorMsg {
+                msg: "Failed to get `SHELL`".to_owned(),
+                err: err.to_string(),
+            });
             return;
         }
     };
@@ -109,12 +112,9 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
 
     let weights = match_scores.iter().max_by_key(|(_, score)| *score);
 
-    match weights {
-        Some((most_seen, score)) => {
-            config_lang = most_seen.to_string();
-            println!("- Matched {most_seen} by file_check {score} times")
-        }
-        None => (),
+    if let Some((most_seen, score)) = weights {
+        config_lang = most_seen.to_string();
+        println!("- Matched {most_seen} by file_check {score} times")
     }
 
     println!(
@@ -129,17 +129,16 @@ pub fn determine_workspace(workspace_config: &Path, config_json: &Path) {
     let language = match language {
         Some(lang) => lang,
         None => {
-            let msg = format!(
-                "Language Config not found, try adding it in {}",
-                config_json.display()
-            );
-            println!("{} {}", icon_cancel, msg);
+            create_error_msg(LogErrorMsg {
+                msg: "Language Config not found, try adding it in".to_owned(),
+                err: String::new(),
+            });
             return;
         }
     };
 
-    // TODO: Write to .workspace-alias here
-    // Maybe a String to store the alias so we don't write iteratively
+    // Store all we want to write here so we don't iteratively open the file and write one by
+    // one...
     let mut to_write = String::new();
     language.command_alias.iter().for_each(|(alias, command)| {
         println!("Alias {alias} added for command {command}");
@@ -168,6 +167,7 @@ fn write_to_alias_config(to_write: &str) {
     let alias_file_path = Path::new(&alias_file);
 
     // We have to check if the path exists first before we do anything
+    // we want to clear everthng
     if alias_file_path.exists() {
         let file = OpenOptions::new()
             .write(true)

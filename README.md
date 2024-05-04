@@ -20,6 +20,7 @@ init function to create alias-thing folder in root dir with
 - [ ] Implement from feature for Alias struct
 - [ ] Method to list available aliases
 - [ ] command to run this binary
+- [ ] add file extension prefix like .zsh or .bash to end of file
 
 # Fixes
 

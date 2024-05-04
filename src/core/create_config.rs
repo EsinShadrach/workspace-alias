@@ -7,17 +7,11 @@ use std::{
 
 use crate::{
     core::{config_operations::config_operation, create_alias_in_shell::create_alias_in_shell},
-    utils::{
-        get_shell::get_shell,
-        log_err_msg::create_error_msg,
-        useful_utils::{cancel_icon, check_mark},
-    },
+    utils::{get_shell::get_shell, log_err_msg::create_error_msg, useful_utils::check_mark},
     LogErrorMsg,
 };
 
 pub async fn create_config_file() {
-    let icon_cancel = &cancel_icon();
-
     match env::var("HOME") {
         Ok(home_path) => {
             let check = &check_mark();
@@ -33,7 +27,10 @@ pub async fn create_config_file() {
                     let file = match File::open(config_path) {
                         Ok(file) => file,
                         Err(err) => {
-                            eprintln!("{} Error opening file: {}", icon_cancel, err);
+                            create_error_msg(LogErrorMsg {
+                                msg: "Error opening file:".to_owned(),
+                                err: err.to_string(),
+                            });
                             return;
                         }
                     };
