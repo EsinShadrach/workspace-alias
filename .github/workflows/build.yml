@@ -25,12 +25,15 @@ jobs:
       - name: Run Docs Clean
         run: cargo doc --no-deps --document-private-items --verbose -r
 
+      - name: Add redirect
+        run: echo '<meta http-equiv="refresh" content="0;url=aoc/index.html">' > ./target/doc/alias_thing/index.html
+
       # Deploy to github pages
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.RUST }}
-          publish_dir: ./target/doc/alias_thing/
+          publish_dir: ./target/doc/
 
       # - name: Create Release
       #   uses: ncipollo/release-action/@v1
