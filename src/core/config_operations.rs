@@ -96,7 +96,7 @@ pub async fn config_operation(alias_config_path: &Path) {
                     "{} Created {} {}",
                     check_mark(),
                     "config.json".bold(),
-                    "Succeffully".color(Color::Green)
+                    "Successfully".color(Color::Green)
                 )
                 .color(Color::Green);
                 println!("{msg}");

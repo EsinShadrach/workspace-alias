@@ -171,7 +171,7 @@ fn write_to_alias_config(to_write: &str) {
     let alias_file_path = Path::new(&alias_file);
 
     // We have to check if the path exists first before we do anything
-    // we want to clear everthng
+    // we want to clear everything
     if alias_file_path.exists() {
         let file = OpenOptions::new()
             .write(true)

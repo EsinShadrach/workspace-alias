@@ -38,7 +38,7 @@ impl fmt::Display for Alias {
     }
 }
 
-/// Provides a unifrom structure so i can log error message in `create_error_msg`
+/// Provides a uniform structure so i can log error message in `create_error_msg`
 pub struct LogErrorMsg {
     msg: String,
     err: String,
